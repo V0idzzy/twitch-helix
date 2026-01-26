@@ -51,6 +51,10 @@ func (c *Client) doRequest(ctx context.Context, method string, endpoint string, 
 		}
 	}
 
+	if resp.StatusCode == http.StatusUnauthorized {
+		return AuthErr
+	}
+
 	if out != nil {
 		return json.NewDecoder(resp.Body).Decode(out)
 	}

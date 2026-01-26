@@ -24,6 +24,7 @@ type Client struct {
 }
 
 // NewClient initializes and returns a new Twitch API client.
+// token can be nil, Call refresh with the refresh token after init.
 //
 // clientID is the Twitch application client ID.
 // token is the OAuth access token associated with the client ID.
@@ -43,4 +44,12 @@ func NewClient(clientID, token *string, httpClient HTTPClient) *Client {
 		clientID:   clientID,
 		token:      token,
 	}
+}
+
+func (c *Client) GetToken() string {
+	if c.token == nil {
+		return ""
+	}
+
+	return *c.token
 }
