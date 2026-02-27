@@ -30,7 +30,7 @@ func (c *Client) Refresh(clientSecret, refreshToken string) (*NewToken, error) {
 
 	tokenRequestData := data.Encode()
 
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	req, err := http.NewRequestWithContext(ctx, "POST", twitchRefreshLink, strings.NewReader(tokenRequestData))
