@@ -121,10 +121,10 @@ func (c *Client) EventChannelUpdate(ctx context.Context, sessionID string, condi
 // You must specify only one broadcaster ID.
 type ConditionChannelRaid struct {
 	// FromBroadcasterUserID is the ID of the broadcaster sending the raid.
-	FromBroadcasterUserID *string `json:"from_broadcaster_user_id"`
+	FromBroadcasterUserID string `json:"from_broadcaster_user_id"`
 
 	// ToBroadcasterUserID is the ID of the broadcaster receiving the raid.
-	ToBroadcasterUserID *string `json:"to_broadcaster_user_id"`
+	ToBroadcasterUserID string `json:"to_broadcaster_user_id"`
 }
 
 // EventChannelRaid subscribes to channel.raid events.
@@ -174,7 +174,7 @@ func (c *Client) EventChannelPointsCustomRewardRedemptionAdd(ctx context.Context
 // ConditionChannelAdBreakBegin represents the condition for an ad break begin event.
 type ConditionChannelAdBreakBegin struct {
 	// BroadcasterUserID is the ID of the broadcaster.
-	BroadcasterUserID *string `json:"broadcaster_user_id"`
+	BroadcasterUserID string `json:"broadcaster_user_id"`
 }
 
 // EventChannelAdBreakBegin subscribes to channel.ad_break.begin events.
@@ -202,10 +202,111 @@ type ConditionEventChannelSubscriptionGift struct {
 	BroadcasterUserID string `json:"broadcaster_user_id"`
 }
 
-// EventChannelSubscriptionGift subscribes to channel point reward redemption events.
+// EventChannelSubscriptionGift subscribes to channel gift sub event
 func (c *Client) EventChannelSubscriptionGift(ctx context.Context, sessionID string, condition ConditionEventChannelSubscriptionGift) (*any, error) {
 	req := EventRequest{
 		Type:      "channel.subscription.gift",
+		Version:   "1",
+		Conditoin: condition,
+		Transport: WebsocketTransport{
+			Method:    "websocket",
+			SessionID: sessionID,
+		},
+	}
+	var resp any
+	err := c.doRequest(ctx, "POST", "eventsub/subscriptions", req, &resp)
+	if err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
+// ConditionEventChannelSubscribe represents the condition for a subscription event. (not resub)
+type ConditionEventChannelSubscribe struct {
+	// BroadcasterUserID is the ID of the broadcaster to monitor.
+	BroadcasterUserID string `json:"broadcaster_user_id"`
+}
+
+// EventChannelSubscribe subscribes to channel subscribtions event
+func (c *Client) EventChannelSubscribe(ctx context.Context, sessionID string, condition ConditionEventChannelSubscribe) (*any, error) {
+	req := EventRequest{
+		Type:      "channel.subscribe",
+		Version:   "1",
+		Conditoin: condition,
+		Transport: WebsocketTransport{
+			Method:    "websocket",
+			SessionID: sessionID,
+		},
+	}
+	var resp any
+	err := c.doRequest(ctx, "POST", "eventsub/subscriptions", req, &resp)
+	if err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
+// ConditionEventChannelSubscriptionMessage represents the condition for a resub with message.
+type ConditionEventChannelSubscriptionMessage struct {
+	// BroadcasterUserID is the ID of the broadcaster to monitor.
+	BroadcasterUserID string `json:"broadcaster_user_id"`
+}
+
+// EventChannelSubscriptionMessage subscribes to channel resubs with a message
+func (c *Client) EventChannelSubscriptionMessage(ctx context.Context, sessionID string, condition ConditionEventChannelSubscriptionMessage) (*any, error) {
+	req := EventRequest{
+		Type:      "channel.subscription.message",
+		Version:   "1",
+		Conditoin: condition,
+		Transport: WebsocketTransport{
+			Method:    "websocket",
+			SessionID: sessionID,
+		},
+	}
+	var resp any
+	err := c.doRequest(ctx, "POST", "eventsub/subscriptions", req, &resp)
+	if err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
+// ConditionEventChannelFollow represents the condition for a follow
+type ConditionEventChannelFollow struct {
+	// BroadcasterUserID is the ID of the broadcaster to monitor.
+	BroadcasterUserID string `json:"broadcaster_user_id"`
+	// ModeratorUserID is the ID of the broadcaster or mod that wants to subscribe.
+	ModeratorUserID string `json:"moderator_user_id"`
+}
+
+// EventChannelFollow subscribes to channel resubs with a message
+func (c *Client) EventChannelFollow(ctx context.Context, sessionID string, condition ConditionEventChannelFollow) (*any, error) {
+	req := EventRequest{
+		Type:      "channel.follow",
+		Version:   "2",
+		Conditoin: condition,
+		Transport: WebsocketTransport{
+			Method:    "websocket",
+			SessionID: sessionID,
+		},
+	}
+	var resp any
+	err := c.doRequest(ctx, "POST", "eventsub/subscriptions", req, &resp)
+	if err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
+// ConditionEventChannelFollow represents the condition for a follow
+type ConditionEventChannelCheer struct {
+	BroadcasterUserID string `json:"broadcaster_user_id"`
+}
+
+// EventChannelCheer subscribes to channel cheers (not integrations/powerups/boosts)
+func (c *Client) EventChannelCheer(ctx context.Context, sessionID string, condition ConditionEventChannelCheer) (*any, error) {
+	req := EventRequest{
+		Type:      "channel.cheer",
 		Version:   "1",
 		Conditoin: condition,
 		Transport: WebsocketTransport{
